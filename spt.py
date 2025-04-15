@@ -2,7 +2,7 @@ import networkx as nx
 from pox.core import core
 from pox.openflow.discovery import Discovery
 from pox.openflow.discovery import LinkEvent
-from pox.openflow.libopenflow_01 import ofp_flow_mod, ofp_match, ofp_action_output
+from pox.openflow.libopenflow_01 import ofp_flow_mod, ofp_match, ofp_port_reason
 
 
 log = core.getLogger()
@@ -37,6 +37,8 @@ class TopologyExample(object):
         self.log_switch_ports()
 
     def spt(self):
+        path={}
+        hops={}
         switches = list(self.switches.keys())
         active_switches = [dpid for dpid in self.switches.keys() if self.is_switch_active(dpid)]
         root_switch = min(switches)
@@ -45,15 +47,16 @@ class TopologyExample(object):
             switches = list(self.switches.keys())
             active_switches = [dpid for dpid in self.switches.keys() if self.is_switch_active(dpid)]
             root_switch = min(switches)
-        
-        for switch in self.switches:
+        for switch in active_switches:
             if (switch != root_switch):
-                path, hops = self.bfs_hops(switch, root_switch)
-                for port in self.switches[switch]:
-                    if (path[1] not in self.switches[switch][port]):
-                        connected = self.links.get((switch, port))
-                        connected_dpid, connected_port = connected
-                        self.block_port(switch, port)
+                path[switch],hops[switch]=self.bfs_hops(switch, root_switch)
+        
+        
+                
+
+            
+            
+
  
 
 
@@ -103,14 +106,14 @@ class TopologyExample(object):
 
     def bfs_hops(self, src, dst):
         try:
-            path = nx.shortest_path(self.graph, src, dst)
-            hops = len(path) - 1
+            paths = list(nx.all_shortest_paths(self.graph, src, dst))
+            chosen_path = min(paths, key=lambda p: p[1] if len(p) > 1 else p[0])
+            hops = len(chosen_path) - 1
             log.info("Path from %s to %s: %s (%s hops)", src, dst, path, hops)
-            return path, hops
+            return chosen_path, hops
         except nx.NetworkXNoPath:
             log.warning("No path from %s to %s", src, dst)
             return [],-1
-
     
     def block_port(self, dpid, port_no):
         if dpid not in self.switches or port_no not in self.switches.get(dpid, {}):
