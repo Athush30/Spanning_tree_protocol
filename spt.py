@@ -50,6 +50,8 @@ class TopologyExample(object):
         for switch in active_switches:
             if (switch != root_switch):
                 path[switch],hops[switch]=self.bfs_hops(switch, root_switch)
+        sorted_hop = dict(sorted(hops.items(),key= lambda item: item[1]), reverse=True)
+        for key in sorted_hop
         
         
                 
