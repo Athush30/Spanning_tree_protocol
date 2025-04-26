@@ -39,9 +39,9 @@ class TopologyExample(object):
     def spt(self):
         path={}
         hops={}
-        switches = list(self.switches.keys())
+        switch_ = list(self.switches.keys())
         active_switches = [dpid for dpid in self.switches.keys() if self.is_switch_active(dpid)]
-        root_switch = min(switches)
+        root_switch = min(switch_)
         while (root_switch not in active_switches):
             del self.switches[root_switch]
             switches = list(self.switches.keys())
@@ -52,13 +52,9 @@ class TopologyExample(object):
                 path[switch],hops[switch]=self.bfs_hops(switch, root_switch)
         sorted_hop = dict(sorted(hops.items(),key= lambda item: item[1]), reverse=True)
         for key in sorted_hop
-        
-        
-                
-
-            
-            
-
+            for port in self.switches[path[key]]
+                if path[key][1]!= self.switches[path[key][port]]
+                   block_port(path[key],port)
  
 
 
