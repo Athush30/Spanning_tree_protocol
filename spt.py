@@ -35,6 +35,7 @@ class TopologyExample(object):
             self.graph.remove_node(dpid)
             log.info("Switch %s removed from topology graph", dpid)
         self.log_switch_ports()
+        spt()
 
     def spt(self):
         path={}
@@ -42,6 +43,7 @@ class TopologyExample(object):
         switch_ = list(self.switches.keys())
         active_switches = [dpid for dpid in self.switches.keys() if self.is_switch_active(dpid)]
         root_switch = min(switch_)
+        active_links=[]
         while (root_switch not in active_switches):
             del self.switches[root_switch]
             switches = list(self.switches.keys())
@@ -53,11 +55,9 @@ class TopologyExample(object):
         sorted_hop = dict(sorted(hops.items(),key= lambda item: item[1]), reverse=True)
         for key in sorted_hop
             for port in self.switches[path[key]]
-                if path[key][1]!= self.switches[path[key][port]]
+                if path[key][1]!= self.switches[path[key][port]]:
                    block_port(path[key],port)
- 
-
-
+                    
     def _handle_LinkEvent(self, event):
         link = event.link
         if event.added:
